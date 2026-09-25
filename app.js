@@ -400,8 +400,8 @@ function renderDashboard() {
         <p class="hero2-lede">A <strong>Medicine Integrity Passport</strong> for every shipment: live temperature, custody at every handoff, early warnings before a breach, automatic quarantine and a ready-made evidence report for the pharmacist.</p>
         <div class="row gap">
           <a class="btn primary lg" href="#/p/${esc(state.shipments.find(s => s.status === 'Created')?.id || state.shipments[0]?.id || '')}">${icon('play')}Open live demo</a>
-          <a class="btn glass lg" href="#/story">Watch the 1-min story</a>
-          <a class="btn glass lg" href="#/sim">${icon('cube')}3D truck tour</a>
+          <a class="btn lg" href="#/story">Watch the 1-min story</a>
+          <a class="btn lg ghost" href="#/sim">${icon('cube')}3D truck tour</a>
         </div>
       </div>
       <div class="hero2-side">
@@ -800,8 +800,19 @@ function seed() {
   save();
 }
 
+// ---------- theme ----------
+const THEME_KEY = 'tempsure.theme';
+function applyTheme(t) { if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme; }
+try { applyTheme(localStorage.getItem(THEME_KEY)); } catch (e) { /* ignore */ }
+function toggleTheme() {
+  const cur = document.documentElement.dataset.theme || (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  applyTheme(next); try { localStorage.setItem(THEME_KEY, next); } catch (e) { /* ignore */ }
+}
+
 // ---------- boot ----------
 (function boot() {
+  const tb = document.getElementById('themeBtn'); if (tb) tb.addEventListener('click', toggleTheme);
   const saved = load();
   if (saved && saved.shipments.length) state = saved; else seed();
   $('#resetAll').addEventListener('click', () => { stopSim(); try { localStorage.removeItem(STORE_KEY); } catch (e) { /* ignore */ } seed(); location.hash = '#/'; route(); });
