@@ -318,6 +318,32 @@ function qrSvg(text) {
   }
 }
 
+// ---------- icons (inline, stroke = currentColor) ----------
+const ICON = {
+  box: '<path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/>',
+  check: '<circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/>',
+  alert: '<path d="M12 3l9.5 16.5h-19L12 3z"/><path d="M12 10v4"/><path d="M12 17.5v.01"/>',
+  lock: '<rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>',
+  thermo: '<path d="M14 14.8V5a2 2 0 0 0-4 0v9.8a4 4 0 1 0 4 0z"/>',
+  play: '<path d="M7 5l12 7-12 7V5z"/>',
+  cube: '<path d="M12 2l9 5v10l-9 5-9-5V7l9-5z"/><path d="M3 7l9 5 9-5"/><path d="M12 12v10"/>',
+  shield: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
+  route: '<circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18H15a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h6.5"/>',
+};
+const icon = (n, cls = '') => `<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n]}</svg>`;
+
+function gauge(t, s) {
+  const R = 52, C = 2 * Math.PI * R, arc = C * 0.75, lo = s.min - 6, hi = s.max + 8;
+  const k = t == null ? 0 : Math.max(0, Math.min(1, (t - lo) / (hi - lo)));
+  const cls = t == null ? 'idle' : t > s.max ? 'hot' : t < s.min ? 'cold' : (s.pred ? 'warn' : 'ok');
+  const bandA = (s.min - lo) / (hi - lo), bandB = (s.max - lo) / (hi - lo);
+  return `<svg class="gauge ${cls}" viewBox="0 0 140 140" aria-hidden="true">
+    <circle cx="70" cy="70" r="${R}" class="g-track" stroke-dasharray="${arc} ${C}" transform="rotate(135 70 70)"/>
+    <circle cx="70" cy="70" r="${R}" class="g-band" stroke-dasharray="0 ${arc * bandA} ${arc * (bandB - bandA)} ${C}" transform="rotate(135 70 70)"/>
+    <circle cx="70" cy="70" r="${R}" class="g-val" stroke-dasharray="${arc * k} ${C}" transform="rotate(135 70 70)"/>
+  </svg>`;
+}
+
 // ---------- rendering primitives ----------
 const cache = {};
 function put(id, html) {
@@ -346,7 +372,9 @@ function chartSvg(s, readings, opts = {}) {
   if (s.freeze && y0 < 0) g += `<line x1="${pl}" x2="${W - pr}" y1="${Y(0)}" y2="${Y(0)}" class="limit freeze"/><text x="${W - pr - 4}" y="${Y(0) - 4}" class="axis freeze-t" text-anchor="end">0°C freeze</text>`;
   PHASES.forEach((p, i) => { if (i) g += `<line x1="${X(p.start)}" x2="${X(p.start)}" y1="${pt}" y2="${H - pb}" class="phase"/>`; g += `<text x="${X(p.start) + 4}" y="${pt - 5}" class="axis">${p.short}</text>`; });
   if (readings.length) {
-    g += `<polyline points="${readings.map(r => `${X(r.m).toFixed(1)},${Y(r.t).toFixed(1)}`).join(' ')}" class="line"/>`;
+    const pts = readings.map(r => `${X(r.m).toFixed(1)},${Y(r.t).toFixed(1)}`).join(' ');
+    g += `<polygon points="${X(readings[0].m).toFixed(1)},${H - pb} ${pts} ${X(last(readings).m).toFixed(1)},${H - pb}" class="area"/>`;
+    g += `<polyline points="${pts}" class="line"/>`;
     readings.forEach(r => { if (r.t > s.max || r.t < s.min) g += `<circle cx="${X(r.m).toFixed(1)}" cy="${Y(r.t).toFixed(1)}" r="2.6" class="${r.t > s.max ? 'dot-hot' : 'dot-cold'}"/>`; });
     const lr = last(readings);
     if (opts.pred) {
@@ -356,7 +384,7 @@ function chartSvg(s, readings, opts = {}) {
     g += `<circle cx="${X(lr.m)}" cy="${Y(lr.t)}" r="4.5" class="head ${tempClass(lr.t, s)}"/>`;
   }
   g += `<text x="${pl}" y="${H - 6}" class="axis">${clock(0)}</text><text x="${W - pr}" y="${H - 6}" class="axis" text-anchor="end">${clock(TRIP_END)}</text>`;
-  return `<svg viewBox="0 0 ${W} ${H}" class="chart" role="img" aria-label="Temperature over the trip">${g}</svg>`;
+  return `<svg viewBox="0 0 ${W} ${H}" class="chart" role="img" aria-label="Temperature over the trip"><defs><linearGradient id="cgArea" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#14b8a6" stop-opacity=".28"/><stop offset="1" stop-color="#14b8a6" stop-opacity="0"/></linearGradient></defs>${g}</svg>`;
 }
 
 // ---------- pages ----------
@@ -365,22 +393,21 @@ function setNav(key) { document.querySelectorAll('[data-nav]').forEach(a => a.cl
 function renderDashboard() {
   setNav('');
   $('#app').innerHTML = `
-    <section class="hero">
-      <div>
-        <p class="eyebrow">Healthtech · Medicine integrity</p>
-        <h1>Every vaccine carries its own proof of safe handling.</h1>
-        <p class="lede">TempSure gives each shipment a <strong>Medicine Integrity Passport</strong> with live temperature, custody at every handoff, early warnings before a breach, automatic quarantine and a ready-made evidence report for the pharmacist.</p>
+    <section class="hero2">
+      <div class="hero2-main">
+        <span class="chip-live"><span class="pulse"></span>Live cold-chain monitoring · Healthtech</span>
+        <h1>Every vaccine carries its own <span class="grad">proof of safe handling</span>.</h1>
+        <p class="hero2-lede">A <strong>Medicine Integrity Passport</strong> for every shipment: live temperature, custody at every handoff, early warnings before a breach, automatic quarantine and a ready-made evidence report for the pharmacist.</p>
         <div class="row gap">
-          <a class="btn primary" href="#/p/${esc(state.shipments.find(s => s.status === 'Created')?.id || state.shipments[0]?.id || '')}">Open live demo shipment</a>
-          <a class="btn" href="#/story">Watch how it works (1 min)</a>
-          <a class="btn" href="#/sim">3D truck tour</a>
-          <a class="btn ghost" href="#/new">Create a passport</a>
+          <a class="btn primary lg" href="#/p/${esc(state.shipments.find(s => s.status === 'Created')?.id || state.shipments[0]?.id || '')}">${icon('play')}Open live demo</a>
+          <a class="btn glass lg" href="#/story">Watch the 1-min story</a>
+          <a class="btn glass lg" href="#/sim">${icon('cube')}3D truck tour</a>
         </div>
       </div>
-      <div class="hero-card">
-        <div class="hero-stat"><span class="big">2–8°C</span><span class="muted">cold chain for almost all vaccines (WHO)</span></div>
-        <div class="hero-stat"><span class="big">~3 bn</span><span class="muted">vaccine doses delivered by UNICEF each year</span></div>
-        <div class="hero-stat"><span class="big">Invisible</span><span class="muted">freeze damage: a frozen vial can look perfectly normal</span></div>
+      <div class="hero2-side">
+        <div class="hstat"><span class="hstat-ic">${icon('thermo')}</span><div><span class="hstat-n">2–8°C</span><span class="hstat-l">cold chain for almost all vaccines (WHO)</span></div></div>
+        <div class="hstat"><span class="hstat-ic">${icon('route')}</span><div><span class="hstat-n">~3 bn</span><span class="hstat-l">vaccine doses delivered by UNICEF each year</span></div></div>
+        <div class="hstat"><span class="hstat-ic">${icon('shield')}</span><div><span class="hstat-n">Invisible</span><span class="hstat-l">freeze damage: a frozen vial can look perfectly normal</span></div></div>
       </div>
     </section>
     <section id="dash-kpis" class="kpis"></section>
@@ -394,10 +421,10 @@ function refreshDashboard() {
   const S = state.shipments;
   const count = f => S.filter(f).length;
   put('dash-kpis', `
-    <div class="kpi"><span class="muted small">Shipments monitored</span><span class="kpi-n">${S.length}</span></div>
-    <div class="kpi"><span class="muted small">In range right now</span><span class="kpi-n">${count(s => ['In transit', 'Delivered', 'Released', 'Created'].includes(s.status))}</span></div>
-    <div class="kpi warn"><span class="muted small">Early warnings</span><span class="kpi-n">${count(s => s.status === 'Warning')}</span></div>
-    <div class="kpi danger"><span class="muted small">On quarantine hold</span><span class="kpi-n">${count(s => s.status === 'Quarantined')}</span></div>`);
+    <div class="kpi"><span class="kpi-ic">${icon('box')}</span><div><span class="kpi-l">Shipments monitored</span><span class="kpi-n">${S.length}</span></div></div>
+    <div class="kpi ok"><span class="kpi-ic">${icon('check')}</span><div><span class="kpi-l">In range right now</span><span class="kpi-n">${count(s => ['In transit', 'Delivered', 'Released', 'Created'].includes(s.status))}</span></div></div>
+    <div class="kpi warn"><span class="kpi-ic">${icon('alert')}</span><div><span class="kpi-l">Early warnings</span><span class="kpi-n">${count(s => s.status === 'Warning')}</span></div></div>
+    <div class="kpi danger"><span class="kpi-ic">${icon('lock')}</span><div><span class="kpi-l">On quarantine hold</span><span class="kpi-n">${count(s => s.status === 'Quarantined')}</span></div></div>`);
   put('dash-table', `<div class="table-wrap"><table class="tbl">
     <thead><tr><th>Passport</th><th>Medicine</th><th>Route</th><th>Temp</th><th>Custody</th><th>Status</th></tr></thead>
     <tbody>${S.map(s => {
@@ -462,7 +489,7 @@ function renderPassport(id) {
   $('#app').innerHTML = `
     <div class="crumbs"><a href="#/">Dashboard</a> / <span class="mono">${esc(s.id)}</span></div>
     <div class="pp-head">
-      <div><h1 class="pp-title">${esc(s.product)}</h1><div class="muted">Medicine Integrity Passport <span class="mono">${esc(s.id)}</span> · ${esc(s.origin)} → ${esc(s.destination)}</div></div>
+      <div class="pp-head-l"><span class="pp-ic">${icon('thermo')}</span><div><h1 class="pp-title">${esc(s.product)}</h1><div class="muted">Medicine Integrity Passport <span class="mono">${esc(s.id)}</span> · ${esc(s.origin)} → ${esc(s.destination)}</div></div></div>
       <div id="pp-status"></div>
     </div>
     <div class="pp-grid">
@@ -566,7 +593,7 @@ function refreshPassport(s) {
   const fixable = started && !s.finished && s.correctedAt == null && (s.warningActive || s.quarantined);
   put('pp-monitor', `
     <div class="mon">
-      <div class="mon-temp ${tempClass(t, s)}"><span class="muted small">Live temperature</span><span class="mon-big">${t == null ? '–' : fmt1(t) + '°C'}</span><span class="muted small">${started ? clock(s.minute) + ' · ' + esc(PHASES[Math.max(0, s.phase)].label) : 'Trip not started'}</span></div>
+      <div class="mon-temp ${tempClass(t, s)}"><div class="gauge-wrap">${gauge(t, s)}<div class="gauge-c"><span class="mon-big">${t == null ? '–' : fmt1(t) + '°'}</span><span class="gauge-l">${s.min}–${s.max}°C</span></div></div><div class="mon-meta"><span class="kpi-l">Live temperature</span><span class="mon-when">${started ? clock(s.minute) + ' · ' + esc(PHASES[Math.max(0, s.phase)].label) : 'Trip not started'}</span>${isRunning(s) ? '<span class="chip-rec"><span class="pulse"></span>Streaming</span>' : ''}</div></div>
       <div class="mon-stats">
         <div><span class="muted small">Peak</span><span>${fmt1(s.peak)}°C</span></div>
         <div><span class="muted small">Low</span><span>${fmt1(s.low)}°C</span></div>
