@@ -479,3 +479,24 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--a
   .kpi-n { font-size: 24px; }
   .pp-head-l .pp-ic { display: none; }
 }
+
+/* open, airy spacing */
+.top nav { gap: 10px; }
+.top nav a { padding: 8px 14px; }
+.theme-btn { margin-left: 14px; }
+.hero2 { gap: 72px; padding: 56px 0 56px; }
+.hero2 .row.gap { gap: 16px; }
+.hero2-side { border-radius: 20px; }
+.hstat { gap: 20px; padding: 24px 26px; }
+.hstat-ic { width: 44px; height: 44px; border-radius: 12px; }
+.kpis { gap: 20px; margin-bottom: 28px; }
+.kpi { gap: 20px; padding: 24px 26px; border-radius: 18px; }
+.kpi-ic { width: 46px; height: 46px; border-radius: 12px; }
+.kpi > div { gap: 4px; }
+.card { padding: 26px 28px; border-radius: 18px; }
+.card-head { margin-bottom: 16px; }
+.tbl td { padding: 18px 12px; }
+.tbl th { padding: 10px 12px; }
+main { padding-top: 32px; padding-bottom: 64px; }
+@media (max-width: 900px) { .hero2 { gap: 32px; padding: 28px 0; } }
+@media (max-width: 560px) { .kpis { gap: 12px; } .kpi { padding: 16px; gap: 12px; } .card { padding: 18px; } .top nav { gap: 4px; } }
