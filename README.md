@@ -10,12 +10,17 @@ A frozen vaccine can look perfect, get injected, and fail to protect the person 
 
 The **See it in action** page is a one-minute animated story. A delivery truck crosses Dubai in 44°C heat carrying four medicine boxes, each with a live thermometer. A cooling vent fails next to the insulin, and TempSure warns the driver's phone before it gets too warm. The driver moves it to the backup fridge, and the nurse at the clinic scans it and sees it is safe. Switch to **What if nobody acts?** to see the insulin locked as "do not use" instead, so it never reaches a patient.
 
+## 3D truck tour
+
+The **3D truck tour** page (`#/sim`) tells the same story inside a fully 3D scene built with Three.js (vendored, no build step). You can see inside the cutaway cargo hold: four labelled medicine crates with live temperature tags, a smoking failed vent, a backup fridge, and the driver walking in to carry the insulin to safety. Drag to orbit the camera and scroll to zoom. Both endings are included, with the nurse's arrival scan at the clinic. If WebGL is unavailable the page falls back to a link to the 2D version.
+
 ## What the demo does
 
 | Feature | What you'll see |
 |---|---|
 | **Medicine Integrity Passport** | Product, lot, expiry, quantity, approved storage profile, linked sensor and current custodian |
 | **Live trip simulation** | Four realistic UAE scenarios: normal delivery, loading-dock near-miss in 44°C heat, van cooling failure, silent freeze |
+| **3D explainer** | Interactive Three.js version of the story: orbit the camera inside the truck, watch the driver carry the insulin to the backup fridge |
 | **Predictive early warning** | Works out the temperature trend and warns *before* a limit is crossed ("breach in about 7 min"), including a projected-path line on the chart |
 | **Human response** | A "Respond: move to validated fridge" action that the presenter can press live to save the shipment |
 | **Automatic quarantine** | A confirmed excursion puts the exact lot on hold and notifies the assessor |

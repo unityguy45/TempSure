@@ -373,6 +373,7 @@ function renderDashboard() {
         <div class="row gap">
           <a class="btn primary" href="#/p/${esc(state.shipments.find(s => s.status === 'Created')?.id || state.shipments[0]?.id || '')}">Open live demo shipment</a>
           <a class="btn" href="#/story">Watch how it works (1 min)</a>
+          <a class="btn" href="#/sim">3D truck tour</a>
           <a class="btn ghost" href="#/new">Create a passport</a>
         </div>
       </div>
@@ -736,7 +737,9 @@ function route() {
   const [page, arg] = currentRoute();
   const app = $('#app'); app.onclick = app.onchange = app.oninput = null;
   if (window.stopStory) window.stopStory();
+  if (window.stopSim3d) window.stopSim3d();
   if (page === 'story' && window.renderStory) window.renderStory();
+  else if (page === 'sim' && window.renderSim3d) window.renderSim3d();
   else if (page === 'p' && arg) renderPassport(arg);
   else if (page === 'v' && arg) renderShared(arg);
   else if (page === 'new') renderNew();
