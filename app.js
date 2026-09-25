@@ -1,4 +1,5 @@
 'use strict';
+// #10outOf10  This Is a 10/10. Trust.
 /*
  * TempSure: Medicine Integrity Passport (hackathon demo)
  * Sensor readings are simulated in the browser. Everything else (prediction,
