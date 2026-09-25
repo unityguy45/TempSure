@@ -372,7 +372,8 @@ function renderDashboard() {
         <p class="lede">TempSure gives each shipment a <strong>Medicine Integrity Passport</strong> with live temperature, custody at every handoff, early warnings before a breach, automatic quarantine and a ready-made evidence report for the pharmacist.</p>
         <div class="row gap">
           <a class="btn primary" href="#/p/${esc(state.shipments.find(s => s.status === 'Created')?.id || state.shipments[0]?.id || '')}">Open live demo shipment</a>
-          <a class="btn" href="#/new">Create a passport</a>
+          <a class="btn" href="#/story">Watch how it works (1 min)</a>
+          <a class="btn ghost" href="#/new">Create a passport</a>
         </div>
       </div>
       <div class="hero-card">
@@ -734,7 +735,9 @@ function route() {
   clearCache();
   const [page, arg] = currentRoute();
   const app = $('#app'); app.onclick = app.onchange = app.oninput = null;
-  if (page === 'p' && arg) renderPassport(arg);
+  if (window.stopStory) window.stopStory();
+  if (page === 'story' && window.renderStory) window.renderStory();
+  else if (page === 'p' && arg) renderPassport(arg);
   else if (page === 'v' && arg) renderShared(arg);
   else if (page === 'new') renderNew();
   else if (page === 'how') renderHow();

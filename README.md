@@ -6,6 +6,10 @@ A frozen vaccine can look perfect, get injected, and fail to protect the person 
 
 **TempSure gives every shipment a Medicine Integrity Passport.** The passport links the medicine to its live temperature, its custody at every handoff, early warnings, automatic quarantine and a qualified decision, all in one tamper-evident record that anyone can open by scanning a QR code.
 
+## See it in action (for non-experts)
+
+The **See it in action** page is a one-minute animated story. A delivery truck crosses Dubai in 44°C heat carrying four medicine boxes, each with a live thermometer. A cooling vent fails next to the insulin, and TempSure warns the driver's phone before it gets too warm. The driver moves it to the backup fridge, and the nurse at the clinic scans it and sees it is safe. Switch to **What if nobody acts?** to see the insulin locked as "do not use" instead, so it never reaches a patient.
+
 ## What the demo does
 
 | Feature | What you'll see |
@@ -40,6 +44,7 @@ Vercel or Netlify work too: import the repo with no build command and `.` as the
 
 ## 5-minute demo script
 
+0. **Story (40 s):** open **See it in action** at 2× so everyone understands the idea in plain language.
 1. **Problem (30 s):** "A frozen vaccine looks perfect but may not protect a child. Today the evidence is scattered across companies."
 2. **Dashboard (20 s):** four shipments with statuses: delivered, quarantined (silent freeze), disposed.
 3. **Live near-miss (90 s):** open **TS-0138**, set 2×, press **Start trip**. The doors open at the dock, the early warning fires, the team responds, and the shipment is delivered in range.
