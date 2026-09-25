@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TempSure · Medicine Integrity Passport</title>
+  <meta name="description" content="TempSure connects every vaccine and temperature-sensitive medicine to its temperature history, custody record and response actions.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f766e'/%3E%3Cpath d='M16 6a3 3 0 0 0-3 3v10.2a5 5 0 1 0 6 0V9a3 3 0 0 0-3-3z' fill='none' stroke='white' stroke-width='2'/%3E%3Ccircle cx='16' cy='23' r='2.4' fill='white'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <a href="#/" class="brand" aria-label="TempSure home">
+      <span class="logo" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="28" height="28"><rect width="32" height="32" rx="8" fill="currentColor"/><path d="M16 6a3 3 0 0 0-3 3v10.2a5 5 0 1 0 6 0V9a3 3 0 0 0-3-3z" fill="none" stroke="#fff" stroke-width="2"/><circle cx="16" cy="23" r="2.4" fill="#fff"/></svg>
+      </span>
+      <span>TempSure</span>
+    </a>
+    <nav>
+      <a href="#/" data-nav="">Dashboard</a>
+      <a href="#/new" data-nav="new">New passport</a>
+      <a href="#/how" data-nav="how">How it works</a>
+    </nav>
+  </header>
+
+  <main id="app" tabindex="-1"></main>
+
+  <footer class="foot">
+    <span>TempSure · Medicine integrity for vaccines and temperature-sensitive medicines. Sensor data in this demo is simulated.</span>
+    <button class="link" id="resetAll" type="button">Reset demo data</button>
+  </footer>
+
+  <script src="vendor/qrcode.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
